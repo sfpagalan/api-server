@@ -1,17 +1,31 @@
-const request = require('supertest');
-const app = require('../src/server');
-const { Food, Clothes } = require('../src/models');
+const express = require('express');
+// const request = require('supertest');
+// const { Food, Clothes, sequelize } = require('../src/models');
+const { app } = require('../src/models/index');
+const supertest = require('supertest');
+const request = supertest(app);
+const { sequelize } = require('../src/models/index');
+
+// const app = express();
+// const request = supertest(app);
 
 describe('API Endpoints', () => {
   beforeAll(async () => {
-    // Set up any data or environment before each test
-    await Food.sync({ force: true });
-    await Clothes.sync({ force: true });
+    await sequelize.sync({ force: true });
   });
 
   afterAll(async () => {
-    // Clean up any remaining test data or environment after running the tests
+    await sequelize.close();
   });
+
+  it('should connect to the database', async () => {
+    try {
+      await sequelize.authenticate();
+      console.log('Connection to the database has been established successfully.');
+    } catch (error) {
+      throw new Error(`Unable to connect to the database: ${error}`);
+    }
+  });  
 
   // Tests for the Food model
   it('should create a new food record', async () => {
@@ -64,7 +78,7 @@ describe('API Endpoints', () => {
 
   it('should delete a food record by ID', async () => {
     const response = await request(app).delete('/food/1');
-
+  
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('id', 1);
   });
@@ -122,10 +136,9 @@ describe('API Endpoints', () => {
   });
 
   it('should delete a clothes record by ID', async () => {
-    const response = await request(app).delete('/clothes/1');
-
+    const response = await request.delete('/clothes/1');
+  
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('id', 1);
   });
-
 });
