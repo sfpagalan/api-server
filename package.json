@@ -1,0 +1,27 @@
+{
+  "name": "api-server",
+  "version": "1.0.0",
+  "description": "Dynamic API Phase 2: Perform CRUD Operations on a database",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sfpagalan/api-server.git"
+  },
+  "author": "Sydney Pagalan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sfpagalan/api-server/issues"
+  },
+  "homepage": "https://github.com/sfpagalan/api-server#readme",
+  "dependencies": {
+    "pg": "^8.11.3",
+    "sequelize": "^6.33.0",
+    "sequelize-cli": "^6.6.1",
+    "sqlite3": "^5.1.6"
+  }
+}
