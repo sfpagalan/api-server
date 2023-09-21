@@ -1,20 +1,41 @@
-const Sequelize = require('sequelize');
-const config = require('../../config/config.json');
+const path = require('path');
+const express = require('express');
+const sequelize = require('../../config/config.js');
 
-const sequelize = new Sequelize(config.database, config.username, config.password, {
-  host: config.host,
-  dialect: config.dialect,
-});
+const app = express();
 
-const FoodModel = require('./food');
-const ClothesModel = require('./clothes');
+const FoodModel = require('./food.js');
+const Food = FoodModel(sequelize);
 
-const Food = FoodModel(sequelize, Sequelize);
-const Clothes = ClothesModel(sequelize, Sequelize);
+const ClothesModel = require('./clothes.js');
+const Clothes = ClothesModel(sequelize);
 
+const foodRoutes = require('../routes/rfood');
+const clothesRoutes = require('../routes/rclothes');
+
+// Register the routes
+app.use('/rfood', foodRoutes);
+app.use('/rclothes', clothesRoutes);
+
+app.delete('/clothes/:id', async (req, res, next) => {
+    const { id } = req.params;
+    try {
+      const deletedClothes = await Clothes.findByPk(id);
+      if (!deletedClothes) {
+        res.status(404).json({ error: 'Clothes not found' });
+      } else {
+        await deletedClothes.destroy();
+        res.status(204).end();
+      }
+    } catch (error) {
+      next(error);
+    }
+    res.status(200).json({ message: 'Deleted clothes' });
+  });
 
 module.exports = {
   Food,
   Clothes,
   sequelize,
+  app,
 };
