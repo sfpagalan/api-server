@@ -2,8 +2,8 @@
 
 require('dotenv').config();
 const { Sequelize, DataTypes } = require('sequelize');
-const Food = require('./food.js');
-const Clothes = require('./clothes.js');
+const Food = require('../models/food/food.js');
+const Clothes = require('../models/clothes/clothes.js');
 
 const SQL_CONNECTION_STRING =
   process.env.SQL_CONNECTION_STRING || 'sqlite:memory';

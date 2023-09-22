@@ -2,14 +2,25 @@
 
 const express = require('express');
 const router = express.Router();
-const { Food } = require('../models/food');
+const { Food } = require('../models/food/food.js');
+
+// router.post('/', async (req, res) => {
+//   try {
+//     const newFood = await Food.create(req.body);
+//     res.status(201).json(newFood);
+//   } catch (error) {
+//     res.status(400).json({ error: 'Failed to create food item.' });
+//   }
+// });
 
 router.post('/', async (req, res) => {
   try {
-    const newFood = await Food.create(req.body);
-    res.status(201).json(newFood);
+    const { name, type } = req.body;
+    const newFood = await Food.create({ name, type });
+    res.status(200).json(newFood);
   } catch (error) {
-    res.status(400).json({ error: 'Failed to create food item.' });
+    console.error(error);
+    res.status(400).json({ error: 'Invalid data' });
   }
 });
 
@@ -38,7 +49,8 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const [rowsUpdated] = await Food.update(req.body, {
-      where: { id: req.params.id },
+      where: { id },
+      returning: true,
     });
     if (rowsUpdated === 0) {
       const updatedFood = await Food.findByPk(req.params.id);

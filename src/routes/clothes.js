@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Clothes } = require('../models/clothes');
+const { Clothes } = require('../models/clothes/clothes');
 
 router.post('/', async (req, res) => {
   try {
@@ -49,18 +49,20 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedClothes = await Clothes.destroy({
-      where: { id: req.params.id },
-    });
-    if (!deletedClothes) {
-      res.status(404).json({ error: 'Clothes not found' });
-    } else {
-      await deletedClothes.destroy();
-      res.status(200).json(deletedClothes);
+    const clothesToDelete = await Clothes.findByPk(req.params.id);
+
+    if (!clothesToDelete) {
+      return res.status(404).json({ error: 'Clothes not found.' });
     }
+
+    await clothesToDelete.destroy();
+    console.log('Clothes item deleted:', clothesToDelete);
+    res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error.', message: error.message });
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 });
+
 
 module.exports = router;

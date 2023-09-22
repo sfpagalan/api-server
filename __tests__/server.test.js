@@ -1,8 +1,8 @@
 'use strict';
 
 const supertest = require('supertest');
-const server = require('../src/server.js');
-const { sequelize } = require('../src/models/');
+const server = require('../lib/server.js');
+const { sequelize } = require('../lib/models');
 const request = supertest(server.app);
 
 beforeAll(async () => {
@@ -11,7 +11,6 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await sequelize.drop();
-  await sequelize.close();
 });
 
 // Tests for food route
