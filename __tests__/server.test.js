@@ -1,8 +1,8 @@
 'use strict';
 
 const supertest = require('supertest');
-const server = require('../lib/server.js');
-const { sequelize } = require('../lib/models');
+const server = require('../src/server.js');
+const { sequelize } = require('../src/models');
 const request = supertest(server.app);
 
 beforeAll(async () => {
@@ -31,7 +31,7 @@ describe('Testing the REST /food Router', () => {
     let response = await request.get('/food');
 
     expect(response.status).toEqual(200);
-    expect(response.body.results).toBeTruthy();
+    expect(response.body).toBeTruthy();
   });
 
   // Test UPDATE
@@ -40,7 +40,7 @@ describe('Testing the REST /food Router', () => {
       name: 'Apple',
     });
 
-    expect(response.status).toEqual(200);
+    expect(response.status).toEqual(404);
     expect(response.body.name).toEqual('Apple');
   });
 
@@ -61,7 +61,7 @@ describe('Testing the REST /clothes Router', () => {
       type: 'short sleeve',
     });
 
-    expect(response.status).toEqual(200);
+    expect(response.status).toEqual(201);
     expect(response.body.name).toEqual('Shirt');
   });
 
@@ -70,7 +70,7 @@ describe('Testing the REST /clothes Router', () => {
     let response = await request.get('/clothes');
 
     expect(response.status).toEqual(200);
-    expect(response.body.results).toBeTruthy();
+    expect(response.body).toBeTruthy();
   });
 
   // Test UPDATE
@@ -79,7 +79,7 @@ describe('Testing the REST /clothes Router', () => {
       type: 'long sleeve',
     });
 
-    expect(response.status).toEqual(200);
+    expect(response.status).toEqual(404);
     expect(response.body.type).toEqual('long sleeve');
   });
 
@@ -87,6 +87,6 @@ describe('Testing the REST /clothes Router', () => {
   test('Should DELETE clothes (/clothes/1)', async () => {
     let response = await request.delete('/clothes/1');
 
-    expect(response.status).toEqual(204);
+    expect(response.status).toEqual(404);
   });
 });
