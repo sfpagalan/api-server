@@ -2,21 +2,15 @@
 
 const express = require('express');
 const router = express.Router();
-const { Food } = require('../models/food/food.js');
-
-// router.post('/', async (req, res) => {
-//   try {
-//     const newFood = await Food.create(req.body);
-//     res.status(201).json(newFood);
-//   } catch (error) {
-//     res.status(400).json({ error: 'Failed to create food item.' });
-//   }
-// });
+const { FoodModel } = require('../models');
 
 router.post('/', async (req, res) => {
   try {
     const { name, type } = req.body;
-    const newFood = await Food.create({ name, type });
+    if (!name || !type) {
+      return res.status(400).json({ error: 'Both name and type are required.' });
+    }
+    const newFood = await FoodModel.create({ name, type });
     res.status(200).json(newFood);
   } catch (error) {
     console.error(error);
@@ -26,7 +20,7 @@ router.post('/', async (req, res) => {
 
 router.get('/', async (req, res, next) => {
   try {
-    const foods = await Food.findAll();
+    const foods = await FoodModel.findAll();
     res.json(foods);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error.', message: error.message });
@@ -35,7 +29,7 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:id', async (req, res) => {
   try {
-    const food = await Food.findByPk(req.params.id);
+    const food = await FoodModel.findByPk(req.params.id);
     if (!food) {
       res.json(food);
     } else {
@@ -48,27 +42,44 @@ router.get('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    const [rowsUpdated] = await Food.update(req.body, {
-      where: { id },
-      returning: true,
-    });
+    const { name, type } = req.body;
+    const { id } = req.params;
+
+    console.log('Updating food item with ID:', id);
+
+    if (!name || !type) {
+      return res.status(400).json({ error: 'Both name and type are required for updating.' });
+    }
+
+    const [rowsUpdated] = await FoodModel.update(
+      { name, type },
+      {
+        where: { id: req.params.id },
+        returning: true,
+      }
+    );
+
+    console.log('Rows updated:', rowsUpdated);
+
     if (rowsUpdated === 0) {
-      const updatedFood = await Food.findByPk(req.params.id);
-      res.json(updatedFood);
-    } else {
       res.status(404).json({ error: 'Food not found.' });
+    } else {
+      const updatedFood = await FoodModel.findByPk(id);
+      console.log('Updated food item:', updatedFood);
+      res.json(updatedFood);
     }
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Internal server error.', message: error.message });
   }
 });
 
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedFood = await Food.destroy({
+    const deletedFood = await FoodModel.destroy({
       where: { id: req.params.id },
     });
-    if (!deletedFood) {
+    if (deletedFood === 1) {
       res.status(204).send();
     } else {
       res.status(404).json({ error: 'Food not found.' });
